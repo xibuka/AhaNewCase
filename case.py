@@ -71,12 +71,12 @@ def newCaseSearch():
         # wait the page to be totally loaded
         driver.refresh()
 
-        driver.save_screenshot('pic2.png')
+        #driver.save_screenshot('pic2.png')
         try:
             element = WebDriverWait(driver, 40).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
                     )
-            driver.save_screenshot('pic3.png')
+            #driver.save_screenshot('pic3.png')
         finally:
             pass
 
