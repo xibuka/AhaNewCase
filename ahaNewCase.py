@@ -78,6 +78,7 @@ def newCaseSearch():
                     )
             #driver.save_screenshot('pic3.png')
         finally:
+            print("Time Out !!!")
             pass
 
         try:
@@ -86,13 +87,14 @@ def newCaseSearch():
 
             analyzeCaseHtml(case_html, caseSent)
 
-            time.sleep(60)
         except KeyboardInterrupt:
             print("Good Bye And Have A Nice Day")
             #driver.close()
 
         finally:
             pass
+
+        time.sleep(300)
 
 def analyzeCaseHtml(case_html,caseSent):
 
