@@ -63,7 +63,6 @@ def newCaseSearch():
     # follow http://selenium-python.readthedocs.io/locating-elements.html#
     driver.find_element_by_link_text("click here to login").click()
     driver.find_element_by_id("username").send_keys(RH_ADDR)
-    driver.save_screenshot('pic2.png')
     driver.find_element_by_id("password").send_keys(RH_ADDR_PW)
     driver.find_element_by_id("_eventId_submit").click()
 
@@ -112,13 +111,14 @@ def analyzeCaseHtml(case_html,caseSent):
         return
 
     for case_row in case_table.find('tbody').find_all('tr'):
-        case_number = (case_row.find_all('td'))[0]
-        case_sev    = (case_row.find_all('td'))[1]
-        case_sbr    = (case_row.find_all('td'))[7]
+        case_NoTitle      = (case_row.find_all('td'))[0]
+        case_NoTitle_text = (case_row.find_all('td'))[0].text
+        case_sev           = (case_row.find_all('td'))[1]
+        case_sbr           = (case_row.find_all('td'))[7]
 
-        if case_number not in caseSent:
-            caseSent.append(case_number)
-            case_summary = str(case_number) + "Sev:" + str(case_sev) + str(case_sbr)
+        if case_NoTitle_text not in caseSent:
+            caseSent.append(case_NoTitle_text)
+            case_summary = str(case_NoTitle) + "Sev:" + str(case_sev) + str(case_sbr)
             send_email(case_summary)
 
 
