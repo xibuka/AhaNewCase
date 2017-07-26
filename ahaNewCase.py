@@ -48,28 +48,34 @@ def send_email(html_str):
     # logout
     server.quit()
 
+def printTime(msg):
+    #print(time.strftime("%a, %d %b %H %M %S", time.gmtime()), ": ", msg)
+    print(time.strftime("%a, %d %b %H:%M:%S", time.localtime()), " - ", msg)
+
 def newCaseSearch():
 
     driver = webdriver.Chrome()
 
-    driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Gluster")
-    #driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Cloud Prods & Envs,Stack,Ceph,Gluster,CFME")
-    #driver.save_screenshot('pic2.png')
+    #driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Gluster")
+    driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Cloud Prods & Envs,Stack,Ceph,Gluster,CFME")
+    #driver.save_screenshot('pic0.png')
 
     # follow http://selenium-python.readthedocs.io/locating-elements.html#
     driver.find_element_by_link_text("click here to login").click()
     driver.find_element_by_id("username").send_keys(RH_ADDR)
+    driver.save_screenshot('pic2.png')
     driver.find_element_by_id("password").send_keys(RH_ADDR_PW)
     driver.find_element_by_id("_eventId_submit").click()
 
+    printTime("Login Successful")
 
-    # login succassful
     caseSent=[]
 
     while True :
 
         # wait the page to be totally loaded
         driver.refresh()
+        printTime("Refreshing...")
 
         #driver.save_screenshot('pic2.png')
         try:
@@ -77,16 +83,15 @@ def newCaseSearch():
                     EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
                     )
             #driver.save_screenshot('pic3.png')
-        finally:
-            print("Time Out !!!")
-            pass
+        except:
+            printTime("Time Out!")
 
         try:
             case_html = driver.find_element_by_class_name("panel-body").get_attribute('innerHTML')
 
-
             analyzeCaseHtml(case_html, caseSent)
 
+            printTime("New Case Checked.")
         except KeyboardInterrupt:
             print("Good Bye And Have A Nice Day")
             #driver.close()
@@ -94,7 +99,7 @@ def newCaseSearch():
         finally:
             pass
 
-        time.sleep(300)
+        time.sleep(120)
 
 def analyzeCaseHtml(case_html,caseSent):
 
