@@ -54,14 +54,25 @@ def printTime(msg):
 
 def newCaseSearch():
 
-    driver = webdriver.Chrome()
+    #driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
 
     #driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Gluster")
     driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Cloud Prods & Envs,Stack,Ceph,Gluster,CFME")
-    #driver.save_screenshot('pic0.png')
+    driver.save_screenshot('firstpage.png')
 
     # follow http://selenium-python.readthedocs.io/locating-elements.html#
     driver.find_element_by_link_text("click here to login").click()
+    
+    try:
+        element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "username"))
+                    )
+    except:
+        driver.save_screenshot('CanNotLogin.png')
+        print("Can not login! Check CanNotLogin.png")
+        exit(1)
+
     driver.find_element_by_id("username").send_keys(RH_ADDR)
     driver.find_element_by_id("password").send_keys(RH_ADDR_PW)
     driver.find_element_by_id("_eventId_submit").click()
