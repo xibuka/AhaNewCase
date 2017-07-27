@@ -81,9 +81,11 @@ def newCaseSearch():
             element = WebDriverWait(driver, 120).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
                     )
-            #driver.save_screenshot('pic3.png')
         except:
+            driver.save_screenshot('timeout.png')
             printTime("Time Out!")
+
+            continue
 
         try:
             case_html = driver.find_element_by_class_name("panel-body").get_attribute('innerHTML')
