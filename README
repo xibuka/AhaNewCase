@@ -1,0 +1,21 @@
+Inform you by sending email when you have new case in Cloud Prods & Envs,Stack,Ceph,Gluster,CFME
+
+# Usage:
+
+1. pull the docker images.
+   # docker pull wenhan/ahanewcase
+
+2. run the container
+   # docker run -d wenhan/ahanewcase:v0.1            \
+                --toAddr=<ToYou@domain.com>          \
+                --fromAddr=<YourAccount@gmail.com>   \
+                --fromAddrPW=<YourGmailPassword>     \
+                --rhuser=<rhn-UserName>              \
+                --rhpass=<rhn-Password>
+
+`Note: email used to send mail need to be Gmail account.`
+
+# Todo List
+1. check case by category.
+2. slim the image.
+3. find why the reload timeout will happen after 12-15 hours running.
