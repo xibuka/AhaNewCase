@@ -49,17 +49,9 @@ def send_email(html_str):
     server.quit()
 
 def printTime(msg):
-    #print(time.strftime("%a, %d %b %H %M %S", time.gmtime()), ": ", msg)
     print(time.strftime("%a, %d %b %H:%M:%S", time.localtime()), " - ", msg)
 
-def newCaseSearch():
-
-    #driver = webdriver.Chrome()
-    driver = webdriver.Firefox()
-
-    #driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Gluster")
-    driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Cloud Prods & Envs,Stack,Ceph,Gluster,CFME")
-    driver.save_screenshot('firstpage.png')
+def login(driver):
 
     # follow http://selenium-python.readthedocs.io/locating-elements.html#
     driver.find_element_by_link_text("click here to login").click()
@@ -78,6 +70,16 @@ def newCaseSearch():
     driver.find_element_by_id("_eventId_submit").click()
 
     printTime("Login Successful")
+
+def newCaseSearch():
+
+    #driver = webdriver.Chrome()
+    driver = webdriver.Firefox() 
+
+    #driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Gluster")
+    driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Cloud Prods & Envs,Stack,Ceph,Gluster,CFME")
+
+    login(driver)
 
     caseSent=[]
 
@@ -158,7 +160,7 @@ if __name__ == "__main__":
     RH_ADDR_PW=args['rhpass']
 
 
-    display = Display(visible=0, size=(800, 600))
+    display = Display(visible=0, size=(1280, 720))
     display.start()
 
     newCaseSearch()
