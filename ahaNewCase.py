@@ -73,23 +73,24 @@ def login(driver):
 
 def newCaseSearch():
 
-    #driver = webdriver.Chrome()
-    driver = webdriver.Firefox() 
+    #"https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Gluster"
+    unified_url="https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Cloud Prods & Envs,Stack,Ceph,Gluster,CFME"
 
-    #driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Gluster")
-    driver.get("https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Cloud Prods & Envs,Stack,Ceph,Gluster,CFME")
-
-    login(driver)
-
+    # store the case which has been sent before
     caseSent=[]
 
     while True :
+
+        driver = webdriver.Firefox() # or webdriver.Chrome()
+
+        driver.get(unified_url)
+
+        login(driver)
 
         # wait the page to be totally loaded
         driver.refresh()
         printTime("Refreshing...")
 
-        #driver.save_screenshot('pic2.png')
         try:
             element = WebDriverWait(driver, 120).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
@@ -108,10 +109,11 @@ def newCaseSearch():
             printTime("New Case Checked.")
         except KeyboardInterrupt:
             print("Good Bye And Have A Nice Day")
-            #driver.close()
 
         finally:
             pass
+
+        driver.close()
 
         time.sleep(120)
 
