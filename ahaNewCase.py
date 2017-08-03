@@ -57,7 +57,7 @@ def login(driver):
     driver.find_element_by_link_text("click here to login").click()
     
     try:
-        element = WebDriverWait(driver, 10).until(
+        element = WebDriverWait(driver, 60).until(
                     EC.presence_of_element_located((By.ID, "username"))
                     )
     except:
@@ -79,20 +79,16 @@ def newCaseSearch():
     # store the case which has been sent before
     caseSent=[]
 
+    driver = webdriver.Firefox() # or webdriver.Chrome()
+
+    driver.get(unified_url)
+
+    login(driver)
+
     while True :
-
-        driver = webdriver.Firefox() # or webdriver.Chrome()
-
-        driver.get(unified_url)
-
-        login(driver)
-
         # wait the page to be totally loaded
-        driver.refresh()
-        printTime("Refreshing...")
-
         try:
-            element = WebDriverWait(driver, 120).until(
+            element = WebDriverWait(driver, 300).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
                     )
         except:
@@ -101,21 +97,22 @@ def newCaseSearch():
 
             continue
 
+        # get the HTML source code and analyze it
         try:
             case_html = driver.find_element_by_class_name("panel-body").get_attribute('innerHTML')
 
             analyzeCaseHtml(case_html, caseSent)
 
             printTime("New Case Checked.")
+
         except KeyboardInterrupt:
             print("Good Bye And Have A Nice Day")
 
-        finally:
-            pass
+        time.sleep(300)
+        driver.refresh()
+        printTime("Refreshing...")
 
-        driver.close()
-
-        time.sleep(120)
+    driver.close()
 
 def analyzeCaseHtml(case_html,caseSent):
 
