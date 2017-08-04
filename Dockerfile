@@ -6,9 +6,6 @@ RUN yum update -y; yum clean all
 # Install any needed packages specified in requirements.txt
 RUN yum -y install firefox xorg-x11-server-Xvfb xorg-x11-fonts-Type1 xorg-x11-fonts-75dpi
 
-# Set the timezone to Asia/Tokyo
-RUN timedatectl set-timezone Asia/Tokyo
-
 # Set the working directory to /app
 WORKDIR /app
 
