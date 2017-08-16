@@ -26,6 +26,9 @@ FROM_ADDR_PW=''
 RH_ADDR=''
 RH_ADDR_PW=''
 
+# store the case which has been sent before
+caseSent=[]
+    
 def send_email(html_str):
 
     tolist= [TO_ADDR]
@@ -54,8 +57,17 @@ def printTime(msg):
 def login(driver):
 
     # follow http://selenium-python.readthedocs.io/locating-elements.html#
-    driver.find_element_by_link_text("click here to login").click()
+    try:
+        element = WebDriverWait(driver, 60).until(
+                    EC.presence_of_element_located((By.LINK_TEST, "click here to login"))
+                    )
+    except:
+        driver.save_screenshot('noLoginLinkFound.png')
+        print("Can not login! Check noLoginLinkFound.png")
+        exit(1)
     
+    driver.find_element_by_link_text("click here to login").click()
+
     try:
         element = WebDriverWait(driver, 60).until(
                     EC.presence_of_element_located((By.ID, "username"))
@@ -76,45 +88,35 @@ def newCaseSearch():
     #"https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Gluster"
     unified_url="https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/Cloud Prods & Envs,Stack,Ceph,Gluster,CFME"
 
-    # store the case which has been sent before
-    caseSent=[]
-
     driver = webdriver.Firefox() # or webdriver.Chrome()
 
     driver.get(unified_url)
 
     login(driver)
 
-    while True :
-        # wait the page to be totally loaded
-        try:
-            element = WebDriverWait(driver, 300).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
-                    )
-        except:
-            driver.save_screenshot('timeout.png')
-            printTime("Time Out!")
+    # wait the page to be totally loaded
+    try:
+        element = WebDriverWait(driver, 300).until(
+                EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
+                )
+    except:
+        driver.save_screenshot('timeout.png')
+        printTime("Time Out! Will retry")
 
-            continue
+        continue
 
-        # get the HTML source code and analyze it
-        try:
-            case_html = driver.find_element_by_class_name("panel-body").get_attribute('innerHTML')
+    # get the HTML source code and analyze it
+  
+    case_html = driver.find_element_by_class_name("panel-body").get_attribute('innerHTML')
 
-            analyzeCaseHtml(case_html, caseSent)
+    analyzeCaseHtml(case_html)
 
-            printTime("New Case Checked.")
-
-        except KeyboardInterrupt:
-            print("Good Bye And Have A Nice Day")
-
-        time.sleep(300)
-        driver.refresh()
-        printTime("Refreshing...")
+    printTime("New Case Checked.")
 
     driver.close()
+    driver.quit()
 
-def analyzeCaseHtml(case_html,caseSent):
+def analyzeCaseHtml(case_html):
 
     soup = BeautifulSoup(case_html, "html.parser")
 
@@ -158,10 +160,12 @@ if __name__ == "__main__":
     RH_ADDR=args['rhuser']
     RH_ADDR_PW=args['rhpass']
 
-
     display = Display(visible=0, size=(1280, 720))
     display.start()
 
-    newCaseSearch()
+    while True :
+        newCaseSearch()
+        time.sleep(300)
+        printTime("Refreshing...")
 
     display.stop()
