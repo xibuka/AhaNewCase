@@ -56,18 +56,6 @@ def printTime(msg):
 
 def login(driver):
 
-    # follow http://selenium-python.readthedocs.io/locating-elements.html#
-    try:
-        element = WebDriverWait(driver, 60).until(
-                    EC.presence_of_element_located((By.LINK_TEST, "click here to login"))
-                    )
-    except:
-        driver.save_screenshot('noLoginLinkFound.png')
-        print("Can not login! Check noLoginLinkFound.png")
-        exit(1)
-    
-    driver.find_element_by_link_text("click here to login").click()
-
     try:
         element = WebDriverWait(driver, 60).until(
                     EC.presence_of_element_located((By.ID, "username"))
@@ -94,16 +82,17 @@ def newCaseSearch():
 
     login(driver)
 
+    driver.get(unified_url)
     # wait the page to be totally loaded
     try:
-        element = WebDriverWait(driver, 300).until(
+        printTime("Waiting case info to show up")
+        element = WebDriverWait(driver, 60).until(
                 EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
                 )
     except:
         driver.save_screenshot('timeout.png')
         printTime("Time Out! Will retry")
-
-        continue
+        return None
 
     # get the HTML source code and analyze it
   
@@ -113,7 +102,7 @@ def newCaseSearch():
 
     printTime("New Case Checked.")
 
-    driver.close()
+    #driver.close()
     driver.quit()
 
 def analyzeCaseHtml(case_html):
@@ -165,7 +154,7 @@ if __name__ == "__main__":
 
     while True :
         newCaseSearch()
+        printTime("sleeping for 300s...")
         time.sleep(300)
-        printTime("Refreshing...")
 
     display.stop()
