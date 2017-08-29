@@ -10,27 +10,32 @@ Inform you by sending email when you have new case in Cloud Prods & Envs,Stack,C
 1. pull the docker images.
 
 ```
-   # docker pull wenhan/ahanewcase
+# docker pull wenhan/ahanewcase
 ```
 
 2. run the container
 ```
-   # docker run -d wenhan/ahanewcase:latest          \
-                --toAddr=<ToYou@domain.com>          \
-                --fromAddr=<YourAccount@gmail.com>   \
-                --fromAddrPW=<YourGmailPassword>     \
-                --rhuser=<rhn-UserName>              \
-                --rhpass=<rhn-Password>
+# docker run -d wenhan/ahanewcase:latest          \
+             --toAddr=<ToYou@domain.com>          \
+             --fromAddr=<YourAccount@gmail.com>   \
+             --fromAddrPW=<YourGmailPassword>     \
+             --rhuser=<rhn-UserName>              \
+             --rhpass=<rhn-Password>
 ```
 
-  the usage of the arguments are:
-  --toAddr      the email address where the notice should be send to.
-  --fromAddr    send from email address. Must be a gmail address
-  --fromAddrPW  password of the send from email address.
-  --rhuser      RH account to access unified.gsslab.rdu2.redhat.com
-  --rhpass      password for RH account
+The usage of the arguments are:
 
-  Note: FromAddr email need to be a Gmail account.
+```
+arguments:
+  -h, --help            show this help message and exit
+  --toAddr TOADDR       the email address where the notice should be send to.
+  --fromAddr FROMADDR   send from email address.
+  --fromAddrPW FROMADDRPW
+                        password of the send from email address.
+  --rhuser RHUSER       RH account to access unified.gsslab.rdu2.redhat.com
+  --rhpass RHPASS       password for RH account
+
+```
 
 # Todo List
 - [ ] make this tool to an web service to folks
