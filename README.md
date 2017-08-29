@@ -29,10 +29,10 @@ The usage of the arguments are:
 arguments:
   -h, --help            show this help message and exit
   --toAddr TOADDR       the email address where the notice should be send to.
-  --fromAddr FROMADDR   send from email address.
+  --fromAddr FROMADDR   send from email address. must be a gmail account
   --fromAddrPW FROMADDRPW
                         password of the send from email address.
-  --rhuser RHUSER       RH account to access unified.gsslab.rdu2.redhat.com
+  --rhuser RHUSER       RH account to access unified web site
   --rhpass RHPASS       password for RH account
 
 ```
