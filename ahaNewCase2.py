@@ -12,12 +12,13 @@ from selenium.webdriver.common.by import By
 from pyvirtualdisplay import Display
 # For html paser
 from bs4 import BeautifulSoup
-# For send email
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
 # For Args
 import argparse
+# For DB access
+import db_control
+import sqlite3
+# For mail
+import sendMail
 
 TO_ADDR=''
 FROM_ADDR=''
@@ -41,34 +42,10 @@ productionToUrl={
         "ansible":"Ansible"
         }
 
-    // Cloud Prods & Envs,Stack,Ceph,Gluster,CFME
+dbname='ecs.db'
+
 def printTime(msg):
     print(time.strftime("%a, %d %b %H:%M:%S", time.localtime()), " - ", msg)
-
-def loginToGmail(mailaddr, password):
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(mailaddr, password)
-
-    return server
-
-# send
-def send_email(html_str, caseType, toList):
-
-    server = loginToGmail(FROM_ADDR,FROM_ADDR_PW)
-
-    # make up the mail
-    msg = MIMEMultipart()
-    msg['Subject'] = caseType + "[" + time.strftime("%a, %d %b", time.gmtime()) + "]"
-    msg['From'] = fromaddr
-    msg['To'] = ", ".join(tolist)
-    msg.attach(MIMEText(html_str, 'html')) # plain will send plain text
-
-    # send the message
-    server.sendmail(fromaddr, tolist, msg.as_string())
-
-    # logout
-    server.quit()
 
 def loginToUnified(username, password):
 
@@ -97,7 +74,7 @@ def loginToUnified(username, password):
 
 def caseSearch():
 
-    // login 
+    # login 
     driver = loginToUnified(RH_ADDR, RH_ADDR_PW)
 
     unifiedUrlBase="https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/"
@@ -110,7 +87,8 @@ def caseSearch():
 
         # wait the page to be totally loaded
         try:
-            printTime("Waiting case info to show up")
+            tmpStr="Waiting case info to show up : " + prod
+            printTime(tmpStr)
             element = WebDriverWait(driver, 60).until(
                     EC.presence_of_element_located((By.CLASS_NAME, "btn-toolbar"))
                     )
@@ -121,72 +99,80 @@ def caseSearch():
     
         # get the HTML source code and analyze it
         case_html = driver.find_element_by_class_name("panel-body").get_attribute('innerHTML')
+
+        conn = sqlite3.connect(dbname)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        mailList=db_control.selectMailListBySBR(c,prod)
     
-        analyzeForNCQ(case_html)
+        analyzeForNCQ(case_html, mailList)
 
     driver.quit()
 
-def analyzeForNCQ(case_html):
+def analyzeForNCQ(case_html, toMailList):
 
     soup = BeautifulSoup(case_html, "html.parser")
 
     # find new case
-    caseTable = soup.find('table', {'id': "table_unassigned"})
+    #caseTable = soup.find('table', {'id': "table_unassigned"})
+    caseTable = soup.find('table', {'id': "table_fts"})
 
-    if caseTable is Null: 
+    if caseTable is None: 
         printTime("No New Case exists")
-    else: 
-        for case_row in caseTable.find('tbody').find_all('tr'):
-            case_NoTitle      = (case_row.find_all('td'))[0]
-            case_NoTitle_text = (case_row.find_all('td'))[0].text
-            case_sev          = (case_row.find_all('td'))[1]
-            case_sbr          = (case_row.find_all('td'))[7]
+        return 
 
-            if case_NoTitle_text not in newCaseSent:
-                newCaseSent.append(case_NoTitle_text)
-                case_summary = str(case_NoTitle) + "Sev:" + str(case_sev) + str(case_sbr)
-                send_email(case_summary, "NCQ", [TO_ADDR])
+    for case_row in caseTable.find('tbody').find_all('tr'):
+        case_NoTitle      = (case_row.find_all('td'))[0]
+        case_NoTitle_text = (case_row.find_all('td'))[0].text
+        case_sev          = (case_row.find_all('td'))[1]
+        case_sbr          = (case_row.find_all('td'))[7]
 
-        printTime("NCQ Case Checked.")
-
-def analyzeForFTS(case_html):
-
-    # find active fts case
-    ftsCaseTable = soup.find('table', {'id': 'table_fts'})
-
-    if ftsCaseTable is Null: 
-        printTime("No active fts case exists, WoW")
-    else: 
-        for case_row in ftsCaseTable.find('tbody').find_all('tr'):
-            case_NoTitle      = (case_row.find_all('td'))[0]
-            case_NoTitle_text = (case_row.find_all('td'))[0].text
-            case_sev          = (case_row.find_all('td'))[1]
-            case_sbt          = (case_row.find_all('td'))[X].text
-            case_WoWho        = (case_row.find_all('td'))[X].text
-            case_sbr          = (case_row.find_all('td'))[7]
-
-            # will not send WoC fts case 
-            if case_WoWho == "WoCustomer":
-                continue
-
-            # will not send fts case which has sbt more than 1 hour
-            #sbrTime = case_sbt..TODO should be int
-            if sbtTime > 60 :
-                continue
-
-            # ftsCaseSent=[]
-            # ftsCaseSentSbtBreached=[]
-            # ftsCaseSentSbtUnder10Min=[]
-            # ftsCaseSentSbtUnder30Min=[]
-
-            if sbtTime < 0
-               
-            if case_NoTitle_text not in newCaseSent:
-                newCaseSent.append(case_NoTitle_text)
-                case_summary = str(case_NoTitle) + "Sev:" + str(case_sev) + str(case_sbr)
-                send_email(case_summary, "active FTS alert", [TO_ADDR])
+        if case_NoTitle_text not in newCaseSent:
+            newCaseSent.append(case_NoTitle_text)
+            case_summary = str(case_NoTitle) + "Sev:" + str(case_sev) + str(case_sbr)
+            sendMail.send(case_summary, "NCQ", toMailList, FROM_ADDR, FROM_ADDR_PW)
 
     printTime("NCQ Case Checked.")
+
+## def analyzeForFTS(case_html):
+## 
+##     # find active fts case
+##     ftsCaseTable = soup.find('table', {'id': 'table_fts'})
+## 
+##     if ftsCaseTable is Null: 
+##         printTime("No active fts case exists, WoW")
+##     else: 
+##         for case_row in ftsCaseTable.find('tbody').find_all('tr'):
+##             case_NoTitle      = (case_row.find_all('td'))[0]
+##             case_NoTitle_text = (case_row.find_all('td'))[0].text
+##             case_sev          = (case_row.find_all('td'))[1]
+##             case_sbt          = (case_row.find_all('td'))[X].text
+##             case_WoWho        = (case_row.find_all('td'))[X].text
+##             case_sbr          = (case_row.find_all('td'))[7]
+## 
+##             # will not send WoC fts case 
+##             if case_WoWho == "WoCustomer":
+##                 continue
+## 
+##             # will not send fts case which has sbt more than 1 hour
+##             #sbrTime = case_sbt..TODO should be int
+##             if sbtTime > 60 :
+##                 continue
+## 
+##             # ftsCaseSent=[]
+##             # ftsCaseSentSbtBreached=[]
+##             # ftsCaseSentSbtUnder10Min=[]
+##             # ftsCaseSentSbtUnder30Min=[]
+## 
+##             if sbtTime < 0
+##                
+##             if case_NoTitle_text not in newCaseSent:
+##                 newCaseSent.append(case_NoTitle_text)
+##                 case_summary = str(case_NoTitle) + "Sev:" + str(case_sev) + str(case_sbr)
+##                 send_email(case_summary, "active FTS alert", [TO_ADDR])
+## 
+##     printTime("NCQ Case Checked.")
 
 # start from here
 if __name__ == "__main__":
