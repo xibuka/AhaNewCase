@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import time
-
+import os.path
 # For login to get the source code
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -13,7 +13,7 @@ from pyvirtualdisplay import Display
 # For html paser
 from bs4 import BeautifulSoup
 # For Args
-import argparse
+import configparser
 # For DB access
 import db_control
 import sqlite3
@@ -178,23 +178,17 @@ def analyzeForFTS(soup, toMailList):
 # start from here
 if __name__ == "__main__":
 
-    # get the arguments from command line
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--fromAddr",  \
-            help="send from email address.")
-    parser.add_argument("--fromAddrPW",\
-            help="password of the send from email address.")
-    parser.add_argument("--rhuser",    \
-            help="RH account to access unified web site")
-    parser.add_argument("--rhpass",    \
-            help="password for RH account")
-    args = parser.parse_args()
-    args = vars(args)
+    if os.path.exists('./auth.cfg') if False:
+        print("run ./initConfig.py first !!")
+        return 1
 
-    FROM_ADDR=args['fromAddr']
-    FROM_ADDR_PW=args['fromAddrPW']
-    RH_ADDR=args['rhuser']
-    RH_ADDR_PW=args['rhpass']
+    config = configparser.RawConfigParser()
+    config.read('./auth.cfg') 
+
+    FROM_ADDR=config2["config"]['fromAddr']
+    FROM_ADDR_PW=config2['config']['fromAddrPW']
+    RH_ADDR=config2['config']['rhuser']
+    RH_ADDR_PW=config2['config']['rhpass']
 
     # make a virtual display for headless broswer
     display = Display(visible=0, size=(1280, 720))
