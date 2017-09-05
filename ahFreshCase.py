@@ -21,6 +21,8 @@ import sqlite3
 import sendMail
 # For log
 import syslog
+# For sent list save
+import pickle
 
 FROM_ADDR=''
 FROM_ADDR_PW=''
@@ -30,9 +32,6 @@ RH_ADDR_PW=''
 # store the case which has been sent before
 newCaseSent=[]
 ftsCaseSent=[]
-ftsCaseSentSbtBreached=[]
-ftsCaseSentSbtUnder10Min=[]
-ftsCaseSentSbtUnder30Min=[]
 
 productionList=["stack", "ceph", "gluster", "cloudform", "ansible"]
 productionToUrl={
@@ -200,7 +199,19 @@ if __name__ == "__main__":
     display = Display(visible=0, size=(1280, 720))
     display.start()
 
+    # read sent case from file    
+    with open('newCaseSent.file', 'rb') as fp:
+        newCaseSent = pickle.load(fp)
+    with open('ftsCaseSent.file', 'rb') as fp:
+        ftsCaseSent = pickle.load(fp)
+
     caseSearch()
      
+    # save sent case to file    
+    with open('newCaseSent.file', 'wb') as fp:
+        pickle.dump(newCaseSent, fp)
+    with open('ftsCaseSent.file', 'wb') as fp:
+        pickle.dump(ftsCaseSent, fp)
+
     # stop the virtual display
     display.stop()
