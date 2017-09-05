@@ -3,3 +3,5 @@ PyVirtualDisplay==0.2.1
 BeautifulSoup4
 argparse
 configparser
+gunicorn
+Flask
