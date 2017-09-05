@@ -43,7 +43,9 @@ productionToUrl={
         "ansible":"Ansible"
         }
 
-dbname='ecs.db'
+confPath='/etc/freshcase/'
+dbname  =confPath     + 'ecs.db'
+authConf=confPath     + 'auth.conf'
 
 def printTime(msg):
     syslog.syslog(msg)
@@ -74,7 +76,7 @@ def loginToUnified(driver, username, password):
 
 def caseSearch():
 
-    driver = webdriver.Firefox() # or webdriver.Chrome()
+    driver = webdriver.Firefox(executable_path=r'/usr/local/bin/geckodriver') 
 
     # login 
     loginToUnified(driver, RH_ADDR, RH_ADDR_PW)
@@ -181,13 +183,13 @@ def analyzeForFTS(soup, toMailList):
 # start from here
 if __name__ == "__main__":
 
-    if os.path.exists('~/auth.cfg') is False:
+    if os.path.exists(authConf) is False:
         printTime("config file Error !!")
         print("Error ! no config file auth.cfg, run initConfig.py first !!")
         exit(1)
 
     config = configparser.RawConfigParser()
-    config.read('~/auth.cfg') 
+    config.read(authConf) 
 
     FROM_ADDR=config["config"]['fromAddr']
     FROM_ADDR_PW=config['config']['fromAddrPW']

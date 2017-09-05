@@ -27,6 +27,8 @@ ADD . /app
 # Copy and untar webdriver for firefox
 ADD https://github.com/mozilla/geckodriver/releases/download/v0.18.0/geckodriver-v0.18.0-linux64.tar.gz /app
 RUN tar xf /app/geckodriver-v0.18.0-linux64.tar.gz -C /usr/local/bin # geckodriver
+RUN mkdir /etc/freshcase
+RUN mv ecs.db /etc/freshcase
 
 # Install requirements for python
 RUN pip3 install -r requirement.txt

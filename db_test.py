@@ -1,7 +1,7 @@
 import db_control
 import sqlite3
 
-dbname = 'ecs.db'
+dbname = '/etc/freshcase/ecs.db'
 
 conn = sqlite3.connect(dbname)
 #conn.row_factory = lambda cursor, row: row[0]

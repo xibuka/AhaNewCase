@@ -24,7 +24,7 @@ config['config'] = {'fromAddr'  : args['fromAddr'],
                     'rhpass'    : args['rhpass']}
 
 # Writing our configuration file to 'example.cfg'
-with open('~/auth.cfg', 'w') as configfile:
+with open('/etc/freshcase/auth.conf', 'w') as configfile:
         config.write(configfile)
 
 #  for read
