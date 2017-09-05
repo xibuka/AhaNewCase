@@ -1,10 +1,22 @@
 # Use an official Python runtime as a parent image
 FROM fedora:26
 
-RUN yum update -y; yum clean all
+MAINTAINER "Wenhan Shi" <wenshi@redhat.com>
 
-# Install any needed packages specified in requirements.txt
-RUN yum -y install firefox xorg-x11-server-Xvfb xorg-x11-fonts-Type1 xorg-x11-fonts-75dpi
+ RUN yum update -y; yum clean all
+
+# Install needed packages 
+RUN yum -y install firefox \ 
+                   xorg-x11-server-Xvfb \
+                   xorg-x11-fonts-Type1 \ 
+                   xorg-x11-fonts-75dpi \
+                   cronie  \
+                   httpd   \
+                   systemd
+
+# start services
+RUN systemctl enable httpd.service
+RUN systemctl enable crond.service
 
 # Set the working directory to /app
 WORKDIR /app
@@ -23,8 +35,11 @@ RUN pip3 install -r requirement.txt
 EXPOSE 80
 
 # Define environment variable
-ENV NAME ahaNewCase
+ENV NAME ahFreshCase
 
-# Run app.py when the container launches
-ENTRYPOINT ["./ahaNewCase.py"]
-CMD ["--help"]
+RUN cat crontab >> /etc/crontab
+
+# Run ./initConfig.py when the container launches
+# ENTRYPOINT ["./initConfig.py"]
+
+CMD ["/usr/sbin/init"]

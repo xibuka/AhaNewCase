@@ -19,6 +19,8 @@ import db_control
 import sqlite3
 # For mail
 import sendMail
+# For log
+import syslog
 
 FROM_ADDR=''
 FROM_ADDR_PW=''
@@ -44,13 +46,12 @@ productionToUrl={
 dbname='ecs.db'
 
 def printTime(msg):
-    print(time.strftime("%a, %d %b %H:%M:%S", time.localtime()), " - ", msg)
+    syslog.syslog(msg)
+    #print(time.strftime("%a, %d %b %H:%M:%S", time.localtime()), " - ", msg)
 
-def loginToUnified(username, password):
+def loginToUnified(driver, username, password):
 
     unified_url="https://unified.gsslab.rdu2.redhat.com/#/"
-
-    driver = webdriver.Firefox() # or webdriver.Chrome()
 
     driver.get(unified_url)
 
@@ -60,7 +61,7 @@ def loginToUnified(username, password):
                     )
     except:
         driver.save_screenshot('CanNotLogin.png')
-        print("Can not login! Check CanNotLogin.png")
+        printTime("Can not login! Check CanNotLogin.png")
         exit(1)
 
     driver.find_element_by_id("username").send_keys(username)
@@ -69,12 +70,14 @@ def loginToUnified(username, password):
 
     printTime("Login Successful")
 
-    return driver
+    return
 
 def caseSearch():
 
+    driver = webdriver.Firefox() # or webdriver.Chrome()
+
     # login 
-    driver = loginToUnified(RH_ADDR, RH_ADDR_PW)
+    loginToUnified(driver, RH_ADDR, RH_ADDR_PW)
 
     unifiedUrlBase="https://unified.gsslab.rdu2.redhat.com/#/SBRPlate/"
     
@@ -178,17 +181,18 @@ def analyzeForFTS(soup, toMailList):
 # start from here
 if __name__ == "__main__":
 
-    if os.path.exists('./auth.cfg') if False:
-        print("run ./initConfig.py first !!")
-        return 1
+    if os.path.exists('~/auth.cfg') is False:
+        printTime("config file Error !!")
+        print("Error ! no config file auth.cfg, run initConfig.py first !!")
+        exit(1)
 
     config = configparser.RawConfigParser()
-    config.read('./auth.cfg') 
+    config.read('~/auth.cfg') 
 
-    FROM_ADDR=config2["config"]['fromAddr']
-    FROM_ADDR_PW=config2['config']['fromAddrPW']
-    RH_ADDR=config2['config']['rhuser']
-    RH_ADDR_PW=config2['config']['rhpass']
+    FROM_ADDR=config["config"]['fromAddr']
+    FROM_ADDR_PW=config['config']['fromAddrPW']
+    RH_ADDR=config['config']['rhuser']
+    RH_ADDR_PW=config['config']['rhpass']
 
     # make a virtual display for headless broswer
     display = Display(visible=0, size=(1280, 720))
