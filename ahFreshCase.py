@@ -219,3 +219,7 @@ if __name__ == "__main__":
 
     # stop the virtual display
     display.stop()
+
+    # cleanup
+    os.system("killall Xvfb");
+    os.system("killall firefox");
