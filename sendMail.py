@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import time
+import datetime
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -11,7 +12,21 @@ def loginToGmail(mailaddr, password):
 
     return server
 
+def apacIsWorking():
+
+    now = datetime.datetime.now()
+
+    # apac team is working between 22:00 - 10:00 in UTC
+    if now.hour > 10 and now.hour < 22:
+        return False
+    else
+        return True
+
 def send(html_str, caseType, toList, fromAddr, fromAddrPW):
+
+    # send mail only in APAC business hours
+    if apacIsWorking() is False:
+        return
 
     server = loginToGmail(fromAddr,fromAddrPW)
 
