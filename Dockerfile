@@ -10,8 +10,10 @@ RUN yum -y install firefox \
                    xorg-x11-server-Xvfb \
                    xorg-x11-fonts-Type1 \ 
                    xorg-x11-fonts-75dpi \
-                   cronie  \
-                   httpd   \
+                   cronie               \
+                   httpd                \
+                   wget                 \
+                   mod_wsgi             \
                    systemd
 
 # start services
@@ -29,9 +31,10 @@ ADD https://github.com/mozilla/geckodriver/releases/download/v0.18.0/geckodriver
 RUN tar xf /app/geckodriver-v0.18.0-linux64.tar.gz -C /usr/local/bin # geckodriver
 RUN mkdir /etc/freshcase
 RUN mv ecs.db /etc/freshcase
+RUN cp www/* /var/www/html/
 
 # Install requirements for python
-RUN pip3 install -r requirement.txt
+RUN pip3 install -r requirements.txt
 
 # Make port 80 available to the world outside this container
 EXPOSE 80
