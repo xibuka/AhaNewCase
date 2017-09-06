@@ -60,5 +60,5 @@ arguments:
 - [x] user can add/remove themself to the service with email address
 - [x] user can change their subscribed SBR plate
 - [x] when NCQ comes up, send mail to all users who has subscibed this SBR
-- [ ] send NCQ case only opened in APAC business hours.
+- [x] send NCQ case only opened in APAC business hours.
 - [x] analyze FTS table, address the policy of how to sending FTS case.
