@@ -19,7 +19,7 @@ def apacIsWorking():
     # apac team is working between 22:00 - 10:00 in UTC
     if now.hour > 10 and now.hour < 22:
         return False
-    else
+    else:
         return True
 
 def send(html_str, caseType, toList, fromAddr, fromAddrPW):
